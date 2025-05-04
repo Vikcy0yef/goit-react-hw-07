@@ -1,18 +1,31 @@
 import React from 'react'
-const SearchBox = ({value, onChange}) => {
+import { useId } from "react";
+import { useDispatch } from "react-redux";
+import { changeFilter } from "../../redux/filtersSlice";
+import s from "./SearchBox.module.css"
+
+const SearchBox = () => {
   
-    const hanseleChande = e => {
-        onChange(e.target.value)
-    }
-  
-    return (
-      <div>
-        <p  >Find contacts by name</p>
-          <label>
-              <input type="text" value={value} onChange={hanseleChande}  />
-              </label>
+   const filterId = useId();
+  const dispath = useDispatch();
+
+  const onFilter = (filter) => {
+    dispath(changeFilter(filter));
+  };
+
+  return (
+    <div className={s.form}>
+      <label htmlFor={filterId}>Find contacts by name</label>
+      <input
+        className={s.input}
+        type="text"
+        name="filter"
+        id={filterId}
+        onChange={(e) => onFilter(e.target.value)}
+      />
     </div>
-  )
-}
+  );
+};
+
 
 export default SearchBox

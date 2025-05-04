@@ -1,69 +1,42 @@
-import React from 'react'
-import { nanoid } from 'nanoid'
-import { Formik, Field, Form, ErrorMessage } from "formik"
-import * as Yup from "yup"
-import { addContact } from '../../redux/contactsSlice';
-import s from './ContactForm.module.css';
+import React from 'react';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { useId } from 'react';
-
-
-
+import { addContact } from '../../redux/contactsOps';
+import s from './ContactForm.module.css';
 
 const validationSchema = Yup.object({
-  name: Yup.string()
-    .min(3)
-    .max(50)
-    .required('Name is required'),
-  number: Yup.string()
-    .min(3)
-    .max(50)
-    .required('Number is required'),
+  name: Yup.string().min(3).max(50).required('Name is required'),
+  number: Yup.string().min(3).max(50).required('Number is required'),
 });
 
 const ContactForm = () => {
   const dispatch = useDispatch();
+  const contacts = useSelector((state) => state.contacts.items); 
 
-  const nameId = useId();
-  const numberId = useId();
-
-    const contacts = useSelector(state => state.contacts.items); 
+  const handleSubmit = (values, actions) => {
+    const normalizedName = values.name.toLowerCase();
     
-const handleSubmit = (values, actions) => {
-  const normalizedName = values.name.toLowerCase();
-  const isDuplicate = contacts.some(
-    contact =>
-      typeof contact.name === 'string' &&
-      contact.name.toLowerCase() === normalizedName
-  );
+    
+    const isDuplicate = contacts.some(
+      (contact) =>
+        contact.name.toLowerCase() === normalizedName
+    );
 
-  if (isDuplicate) {
-    alert(`${values.name} is already in contacts.`);
-    return;
-  }
-
-  dispatch(
-    addContact({
-      id: nanoid(),
-      name: values.name,
-      number: values.number,
-    })
-  );
-
-  actions.resetForm();
-};
-  const handleNumberInput = (e) => {
-    const value = e.target.value;
-    const cursorPosition = e.target.selectionStart;
-
-    if (e.key === "+" && cursorPosition !== 0) {
-      e.preventDefault();
+    if (isDuplicate) {
+      alert(`${values.name} is already in contacts.`);
       return;
     }
 
-    if (!/[0-9+]/.test(e.key) || (e.key === "+" && value.includes("+"))) {
-      e.preventDefault();
-    }
+    
+    dispatch(
+      addContact({
+        name: values.name,
+        number: values.number,
+      })
+    );
+
+    actions.resetForm(); 
   };
 
   return (
